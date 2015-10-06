@@ -12,11 +12,22 @@ import static org.junit.Assert.*;
  */
 public class DeckTest {
 
-    private Deck myDeck;
+    private Deck normalDeck;
+    private Deck deckWithTwoJokers;
+
+    private Deck defaultDeckWithTwoJokers;
+    private Deck shuffledDeckWithTwoJokers;
 
     @Before
     public void setUp() throws Exception {
-        myDeck = new Deck();
+        // Create normal deck
+        normalDeck = new Deck();
+
+        // Create deck with two jokers
+        deckWithTwoJokers = new Deck(2);
+
+        defaultDeckWithTwoJokers = new Deck(2);
+        shuffledDeckWithTwoJokers = new Deck(2);
     }
 
     /*
@@ -25,46 +36,73 @@ public class DeckTest {
      */
     @Test
     public void testShuffleDeck() throws Exception {
-        myDeck.shuffleDeck();
-        assertTrue(myDeck.getCards().size() == 52);
 
-        HashSet<Card> deckSet = new HashSet<>();
+        normalDeck.shuffleDeck();
+        deckWithTwoJokers.shuffleDeck();
 
-        for (Card c : myDeck.getCards()) {
+        assertEquals(normalDeck.getDeckSize(), 52);
+        assertEquals(deckWithTwoJokers.getCards().size(), 54);
+        assertEquals(deckWithTwoJokers.getNumJokers(), 2);
+        assertNotEquals(normalDeck.getDeckSize(), "apple");
+        assertNotEquals(deckWithTwoJokers.getNumJokers(), 0);
+
+        HashSet<Card> deckSet = new HashSet<Card>();
+
+        // Filter out duplicate cards
+        for (Card c : deckWithTwoJokers.getCards()) {
             deckSet.add(c);
         }
-        assertTrue(deckSet.size() == 52);
+
+        // Verify deck size is still 52 + 2 jokers
+        assertTrue(deckSet.size() == 54);
     }
 
     /*
-     * Test Deck's sort function
+     * Test Deck's sort function with
      * @throws Exception
      */
     @Test
     public void testSortDeck() throws Exception {
-        myDeck.sortDeck(SortType.SUIT, SortDirection.ASCENDING);
 
+        // Create two decks, each with 52 cards + 2 jokers
+
+        System.out.println("\nDefault deck: pre-sort");
+        for (int i=0; i<10; i++) {
+            System.out.println(defaultDeckWithTwoJokers.getCards().get(i).toString());
+        }
+
+        // Shuffle one deck
+        shuffledDeckWithTwoJokers.shuffleDeck();
+
+        System.out.println("\nShuffled deck: pre-sort");
+        for (int i=0; i<10; i++) {
+            System.out.println(shuffledDeckWithTwoJokers.getCards().get(i).toString());
+        }
+
+        // Sort shuffled deck to default sort-order
+        shuffledDeckWithTwoJokers.sortDeck(SortType.RANK, SortDirection.DESCENDING);
+
+        System.out.println("\nShuffled deck: post-sort");
+        for (int i=0; i<10; i++) {
+            System.out.println(shuffledDeckWithTwoJokers.getCards().get(i).toString());
+        }
+
+        // Verify shuffled/sorted deck is identical in content and order as the untouched default deck
+        assertArrayEquals(defaultDeckWithTwoJokers.getCards().toArray(), shuffledDeckWithTwoJokers.getCards().toArray());
+
+        Card threeOfDiamonds = new Card(Rank.THREE, Suit.DIAMONDS);
         Card aceOfSpades = new Card(Rank.ACE, Suit.SPADES);
+        Card blackJoker = new Card(1);
 
-        assertEquals(aceOfSpades, myDeck.getCards().get(0));
-        assertNotEquals(aceOfSpades, myDeck.getCards().get(5));
+        // Verify correct order of cards
+        assertEquals(threeOfDiamonds, shuffledDeckWithTwoJokers.getCards().get(49));
+        assertEquals(aceOfSpades, shuffledDeckWithTwoJokers.getCards().get(2));
 
-        Deck sortedDeck = new Deck();
-        myDeck.shuffleDeck();
-        myDeck.sortDeck(SortType.VALUE, SortDirection.DESCENDING);
+        assertNotEquals(blackJoker, shuffledDeckWithTwoJokers.getCards().get(0));
+        assertNotEquals(threeOfDiamonds, shuffledDeckWithTwoJokers.getCards().get(25));
 
-        System.out.println("Sorted deck");
-        for (int i=0; i<5; i++) {
-            System.out.println(sortedDeck.getCards().get(i).toString());
-        }
-
-        System.out.println("\n");
-        System.out.println("myDeck - post sort");
-        for (int i=0; i<5; i++) {
-            System.out.println(myDeck.getCards().get(i).toString());
-        }
-
-        assertArrayEquals(sortedDeck.getCards().toArray(), myDeck.getCards().toArray());
+        // Verify correct joker position
+        assertEquals(blackJoker, shuffledDeckWithTwoJokers.getCards().get(1));
 
     }
 }

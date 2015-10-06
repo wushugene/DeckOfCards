@@ -15,11 +15,13 @@ public class CardTest {
 
     private Card card1;
     private Card card2;
+    private Card card3;
 
     @Before
     public void setUp() throws Exception {
         card1 = new Card(Rank.QUEEN, Suit.HEARTS);
         card2 = new Card(Rank.SEVEN, Suit.SPADES);
+        card3 = new Card(Rank.QUEEN, Suit.HEARTS);
 
         assertFalse(card1 == null);
     }
@@ -30,13 +32,19 @@ public class CardTest {
      */
     @Test
     public void testEquals() throws Exception {
-        Card card3 = new Card(Rank.QUEEN, Suit.HEARTS);
+
+        Card blackJoker = new Card(1);
+        Card redJoker = new Card(2);
+        Card blackJokerPrime = new Card(1);
+
 
         assertTrue(card1.equals(card3));
         assertFalse(card1.equals(card2));
         assertFalse(card2.equals(null));
         assertFalse(card1.equals("Queen"));
         assertFalse(card2.equals(8));
+        assertNotEquals(blackJoker, redJoker);
+        assertEquals(blackJoker, blackJokerPrime);
     }
 
     @Test
